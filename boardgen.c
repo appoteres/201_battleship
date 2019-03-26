@@ -6,6 +6,7 @@
 static char p1 = 'X';
 static char p2 = 'O';
 static int flag = 0;
+static char currPlayer = 'X';
 
 
 //board is always square
@@ -19,6 +20,12 @@ struct board
 
 } ;
 
+void flipTurn(){
+	if (currPlayer== 'X'){
+		currPlayer = 'O';
+	}
+	else currPlayer = 'X';
+}
 
 Board *newBoard(int sqNum){
 	Board *tempBoard = malloc(sizeof(Board));
@@ -122,17 +129,19 @@ int main(int argc, char *argv[]){
 		
 
 		int move;
-		printf("Where would you like to insert?\n");
+		printf("Player %c Where would you like to insert?\n",currPlayer);
 		scanf("%i",&move);
 		
 
-		if (flag == 0){
-			insertPiece(this,move-1,p1);
-		}
-		else{ 
-			insertPiece(this,move-1,p2);
-		}
-		flip(flag);
+		insertPiece(this,move-1,currPlayer);
+		flipTurn();
+		// if (flag == 0){
+		// 	insertPiece(this,move-1,p1);
+		// }
+		// else{ 
+		// 	insertPiece(this,move-1,p2);
+		// }
+		// flip(flag);
 		
 
 
