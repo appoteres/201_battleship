@@ -17,3 +17,14 @@
 #   ##   ##   ##   #
 #   ##   ##   ##   #
 ####################
+
+^^this takes too much space
+
+use this:
+[x][o][x][o]
+
+[ ][ ][ ][ ]
+[ ][ ][ ][ ]
+[ ][ ][ ][ ]
+[ ][ ][ ][ ]
+allows bigger boards to be played

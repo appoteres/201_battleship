@@ -2,13 +2,13 @@
 #define __BG_INCLUDED__
 
 #include <stdio.h>
+#include <stdlib.h>
 
-typedef struct board Board;
+typedef struct board BOARD;
 
-
-extern Board *newBoard(int);
-extern void printBoard(Board *this);
-extern void insertPiece(Board *brd,int position,char piece);
-extern int getNextSpot(Board *brd,int pos);
+extern BOARD *newBoard(int row, int col);
+extern void initializeBoard(BOARD *brd);
+extern void printBoard(BOARD *brd);
+extern void insertPiece(BOARD *brd,int position,char piece);
 
 #endif

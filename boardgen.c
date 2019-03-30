@@ -1,157 +1,128 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <limits.h>
 #include "boardgen.h"
-
-static char p1 = 'X';
-static char p2 = 'O';
-static int flag = 0;
-static char currPlayer = 'X';
-
 
 //board is always square
 //board will take input from user for size parameter
 //make that many sqaures
-struct board
+struct  board
 {
-	int size;
-	char index[1000][1000];
-	//int numSquares;
+	int NumRows;
+	int NumCols;
+	int **index;
+	int *topTrack;
+	int occupiedSquares;
+};
 
-} ;
+// int checkFull(Board *brd,int col){
+// 	//we know its full if the top row is full
+// 	brd->index;
+// }
 
-void flipTurn(){
-	if (currPlayer== 'X'){
-		currPlayer = 'O';
+BOARD *newBoard(int row, int col){
+	//printf("board getting initialized\n");
+
+	BOARD *tempBoard;
+	tempBoard = malloc(sizeof(BOARD));
+	
+	if (tempBoard==0){
+		printf("Allocating a BOARD: out of mem\n");
+		exit(0);
 	}
-	else currPlayer = 'X';
-}
 
-Board *newBoard(int sqNum){
-	Board *tempBoard = malloc(sizeof(Board));
-	tempBoard->size = sqNum;
-	for (int j = 0; j <sqNum; j++)
-		for (int i = 0; i<sqNum; i++){
-			//Square *temp = newSquare();
-			tempBoard->index[j][i] = ' ';
-		}
+	tempBoard->NumCols = col;
+	tempBoard->NumRows = row;
+
+
+	tempBoard->index =  malloc(((tempBoard->NumRows-1) * sizeof(int*)));
+	for(int i = 0;i <=tempBoard->NumRows-1;i++){
+		tempBoard->index[i] = malloc(((tempBoard->NumCols-1) * sizeof(int)));
+		printf("%d\n",i);
+	}
+
+	tempBoard->topTrack = malloc(tempBoard->NumCols * sizeof(int));
+
+
+	//initialize all spots to 0, so we have a blank board
+	initializeBoard(tempBoard);
+
+	tempBoard->occupiedSquares =0;
+
 	return tempBoard;
 
 }
 
-void printBoard(Board *brd){
+void initializeBoard(BOARD *brd){
+	for (int i=0;i<brd->NumCols-1;i++){
+		for(int j=0;j<brd->NumRows-1;j++){
+			brd->index[i][j] = 0;
+		}
+	}
+	for (int i=0;i<brd->NumCols;i++){
+		brd->topTrack[i] = brd->NumRows-1;
+	}
+}
+
+// 1 is X , 2 is O
+void printBoard(BOARD *brd){
 	//print positions above board
-	int currentX = 0;
-	int currentY = 0;
-	
-	for (int i =1;i<brd->size+1;i++){
-		printf("  %i  ",i);
+	for (int i =1;i<=brd->NumCols;i++){
+		printf(" %i ",i);
 	}
 	printf("\n");
-				
-	for(int q = 0;q<brd->size;q++){
 
-		//print the top line
-		for (int i =0;i<brd->size;i++){
-			printf("#####");
+	// for (int i=0;i<brd->NumCols;i++){
+	// 	printf(" %i ",brd->topTrack[i]);
+	// }
+	// printf("\n");
+
+	for (int i=0;i<brd->NumRows;i++){
+		for(int j=0;j<brd->NumCols;j++){
+			if(brd->index[i][j] == 1){
+				printf("[X]");
+			}
+			else if(brd->index[i][j] == 2){
+				printf("[O]");
+			}
+			else{
+				printf("[ ]");
+			}
 		}
 		printf("\n");
-
-		//print the areas that hold the squares
-		for (int j = 0;j<3;j++){
-			for (int i =0;i<brd->size;i++){
-				if (j == 1){
-					printf("# %c #",brd->index[i][q]);
-				}
-				else{
-					printf("#   #");
-				}
-			}
-			printf("\n");
-		}
 	}
-	
-	//print the bottom line
-	for (int i =0;i<brd->size;i++){
-		printf("#####");
-	}	
+	for (int i =0;i<brd->NumCols;i++){
+		printf("---");
+	}
 	printf("\n");
 }
-void insertPiece(Board *brd,int position,char piece){
-	printf("Inserting...\n");
-	brd->index[position][getNextSpot(brd,position)] = piece;
-	printf("\nHere is the board after that move:\n");
+
+void insertPiece(BOARD *brd,int column,char piece){
+	//check valid move first
+	//printf("attempt to insert in column %d\n",column);
+	//printf("board dimensions are %d rows %d cols\n",brd->NumRows,brd->NumCols);
+
+	while (column > brd->NumCols || column <= 0){
+		printf("That is an invalid column, pick another\n");
+		scanf("%i",&column);
+	}
+	while (brd->topTrack[column-1]<0){
+		printf("That column is full, pick another\n");
+		scanf("%i",&column);	
+	}
+
+	int input;
+	//piece to num
+	if (piece == 'X'){
+		input = 1;
+	}
+	else {
+		input = 2;
+	}
+
+	brd->index[brd->topTrack[column-1]][column-1] = input;
+	brd->topTrack[column-1]--;
+	//printf("inserted into row %i\n",brd->topTrack[column]-1);
 	printBoard(brd);
 	return;
 }
-
-int getNextSpot(Board *brd,int pos){
-	int spot;
-	if (brd->index[pos][brd->size-1] == ' '){
-		spot = brd->size-1;
-		return spot;
-	}
-	else{
-		char temp;
-		int size = brd->size-1;
-		temp = brd->index[pos][brd->size-1];
-		while(temp != ' '){
-			temp = brd->index[pos][size--];
-		}
-		spot = size+1;
-		return spot;
-	}
-
-
-}
-
-void flip(){
-	if (flag){
-		flag = 0; 
-	}
-	else {
-		flag = 1;
-	}
-}
-
-#ifndef TESTINGBOARD
-int main(int argc, char *argv[]){
-	if (argc != 2){
-		printf("Please input size of board.\n");
-		return 1;
-	}
-	int size = atoi(argv[1]);
-	Board *this = newBoard(size);
-	printBoard(this);
-
-	for (;;)
-	{
-		
-
-		int move;
-		printf("Player %c Where would you like to insert?\n",currPlayer);
-		scanf("%i",&move);
-		
-
-		insertPiece(this,move-1,currPlayer);
-		flipTurn();
-		// if (flag == 0){
-		// 	insertPiece(this,move-1,p1);
-		// }
-		// else{ 
-		// 	insertPiece(this,move-1,p2);
-		// }
-		// flip(flag);
-		
-
-
-		// for (int i=0; i<size; i++){
-		// 	for (int j =0; j<size; j++){
-		// 		printf("[%i][%i] %c\n",i,j,this->index[i][j]);
-		// 	}
-
-		// }
-	}	
-}
-
-#endif
