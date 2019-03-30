@@ -1,4 +1,4 @@
-# 201_connect4
+201_connect4
 CS201 2019 spring, semester portfolio submission
 
 Connect-Four with arbitrary board size-one player against computer and player against
