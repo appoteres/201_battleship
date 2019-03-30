@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <limits.h>
 #include "boardgen.h"
 
@@ -96,6 +96,7 @@ void printBoard(BOARD *brd){
 	}
 	printf("\n");
 }
+
 
 void insertPiece(BOARD *brd,int column,char piece){
 	//check valid move first

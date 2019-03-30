@@ -1,8 +1,8 @@
 #ifndef __BG_INCLUDED__
 #define __BG_INCLUDED__
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef struct board BOARD;
 

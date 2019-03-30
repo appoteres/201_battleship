@@ -1,6 +1,7 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "boardgen.h"
+#include "engine.h"
 
 static char currPlayer = 'X';
 
@@ -33,15 +34,12 @@ int main()
 	for (;;)
 	{
 		
-
 		int move;
 		printf("Player %c Where would you like to insert?\n",currPlayer);
 		scanf("%i",&move);
 		
 		insertPiece(mainBoard,move,currPlayer);
 		flipTurn();
-		
-
 
 	}	
 	return 0;
