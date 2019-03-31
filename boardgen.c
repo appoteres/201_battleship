@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <ncurses.h>
 #include "boardgen.h"
 
 //board is always square
@@ -12,6 +13,7 @@ struct  board
 	int NumCols;
 	int **index;
 	int *topTrack;
+	int inputLine;
 	int occupiedSquares;
 };
 
@@ -27,7 +29,7 @@ BOARD *newBoard(int row, int col){
 	tempBoard = malloc(sizeof(BOARD));
 	
 	if (tempBoard==0){
-		printf("Allocating a BOARD: out of mem\n");
+		printw("Allocating a BOARD: out of mem\n");
 		exit(0);
 	}
 
@@ -47,7 +49,7 @@ BOARD *newBoard(int row, int col){
 	initializeBoard(tempBoard);
 
 	tempBoard->occupiedSquares =0;
-
+	tempBoard->inputLine = row +3;
 	return tempBoard;
 
 }
@@ -66,10 +68,11 @@ void initializeBoard(BOARD *brd){
 // 1 is X , 2 is O
 void printBoard(BOARD *brd){
 	//print positions above board
+	clear();
 	for (int i =1;i<=brd->NumCols;i++){
-		printf("%3i",i);
+		printw("%3i",i);
 	}
-	printf("\n");
+	printw("\n");
 
 	// for (int i=0;i<brd->NumCols;i++){
 	// 	printf(" %i ",brd->topTrack[i]);
@@ -79,35 +82,50 @@ void printBoard(BOARD *brd){
 	for (int i=0;i<brd->NumRows;i++){
 		for(int j=0;j<brd->NumCols;j++){
 			if(brd->index[i][j] == 1){
-				printf("[X]");
+				printw("[X]");
 			}
 			else if(brd->index[i][j] == 2){
-				printf("[O]");
+				printw("[O]");
 			}
 			else{
-				printf("[ ]");
+				printw("[ ]");
 			}
 		}
-		printf("\n");
+		printw("\n");
 	}
 	for (int i =0;i<brd->NumCols;i++){
-		printf("---");
+		printw("---");
 	}
-	printf("\n");
+	printw("\n");
+	refresh();
 }
 
+void clearInputLine(BOARD *brd){
+	move(brd->inputLine,0);
+	clrtoeol();
+	move(brd->inputLine,0);
+}
 
 void insertPiece(BOARD *brd,int column,char piece){
 	//check valid move first
 	//printf("attempt to insert in column %d\n",column);
 	//printf("board dimensions are %d rows %d cols\n",brd->NumRows,brd->NumCols);
 
+	int x,y;	
 	while (column > brd->NumCols || column <= 0){
-		printf("That is an invalid column, pick another\n");
+		getyx(stdscr,y,x);
+		mvprintw(y,x-x,"That is an invalid column, pick another");
+		clearInputLine(brd);
+		refresh();
+		echo();
 		scanf("%i",&column);
 	}
-	while (brd->topTrack[column-1]<0){
-		printf("That column is full, pick another\n");
+	while (brd->topTrack[column-1]<0){	
+		getyx(stdscr,y,x);
+		mvprintw(y,x-x,"That column is full, pick another");
+		clearInputLine(brd);
+		refresh();
+		echo();
 		scanf("%i",&column);	
 	}
 
