@@ -1,6 +1,15 @@
 201_connect4
 CS201 2019 spring, semester portfolio submission
 
+scores.bin MUST exist, it was included in the zip file.
+
+
+
+
+
+
+
+
 Connect-Four with arbitrary board size-one player against computer and player against
 player-uses a function to determine wining state and must use a graph to determine the
 “next best” move

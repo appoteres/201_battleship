@@ -4,13 +4,12 @@
 #include <ncurses.h>
 #include <string.h>
 #include "boardgen.h"
-#include "engine.h"
 
 
 FILE *saveFile;
 WINDOW *board, *prompt, *title;
 int maxx, maxy;
-char menuList[3][20] = {"PLAY","SCORES", "EXIT"};
+char menuList[4][20] = {"1 Player","2 Player","SCORES", "EXIT"};
 
 
 static char currPlayer = 'X';
@@ -30,7 +29,7 @@ void start(){
 
 void drawMenu(int choice){
 	int i;
-	for (i=0;i<3;i++){
+	for (i=0;i<4;i++){
 		move(maxy/2+2*(i-1),(maxx - strlen(menuList[1]))/2);
 		if (i==choice){
 			attron(A_REVERSE);
@@ -56,11 +55,11 @@ int startMenu(){
 		c = getch();
 		if(c ==10 || c == ' ') break;
 		if(c == KEY_DOWN){
-			choice = (choice+1) %3;
+			choice = (choice+1) %4;
 			drawMenu(choice);
 		}
 		if(c == KEY_UP){
-			choice = (choice+2) %3;
+			choice = (choice+3) %4;
 			drawMenu(choice);			
 		}
 		if(i < (int)strlen(s)){
@@ -73,15 +72,37 @@ int startMenu(){
 	return choice;
 }
 
+void writeWinner(char currPlayer){
+	saveFile = fopen("scores.bin","r+");
+	if(currPlayer =='X'){
+		int x;
+		fseek(saveFile,0,SEEK_SET);
+		fscanf(saveFile,"%3i",&x);
+		x++;
+		fseek(saveFile,0,SEEK_SET);
+		fprintf(saveFile,"%3i\n",x);
+		fclose(saveFile);
+	}
+	else{
+		int x;
+		fseek(saveFile,4,SEEK_SET);
+		fscanf(saveFile,"%3i",&x);
+		x++;
+		fseek(saveFile,4,SEEK_SET);
+		fprintf(saveFile,"%3i\n",x);
+		fclose(saveFile);
+	}
+}
+
+
 int main()
 {
  
   int chosen;
-  int temp,numRows, numCols,status;
+  int temp,numRows, numCols,status,x,o;
   start();
   getmaxyx(stdscr, maxy, maxx);
   chosen = startMenu();
-  
 
   switch(chosen) {
   case 0: /* play */
@@ -148,6 +169,7 @@ int main()
 		if(checkWin(mainBoard, currPlayer)){
 			getyx(stdscr,y,x);
 			mvprintw(y+1,x-x,"Player %c has won!\nPress Enter to Exit",currPlayer);
+			writeWinner(currPlayer);
 			refresh();
 			getch();
 			endwin();
@@ -157,22 +179,41 @@ int main()
 
 	}
 
-
-
     break;
-  
-
-  case 1: /* check scores*/
- 
+  case 1: /*2 player*/
     break;
-  case 2: /* Quit */
+  case 2: /* check scores*/
+
+	//saveFile = fopen("scores.bin","r+");
+	
+	//fseek(saveFile,0,SEEK_SET);
+	// fscanf(saveFile,"%[^\n]",&x);
+	// fscanf(saveFile,"%[^\n]",&o);
+	nodelay(stdscr, FALSE);
+	clear();
+	saveFile = fopen("scores.bin","r+");
+	fseek(saveFile,0,SEEK_SET);
+	fscanf(saveFile,"%d",&x);
+	fscanf(saveFile,"%d",&o);
+	mvprintw(maxy/4,maxx/6,"X wins: %d",x);
+	mvprintw(maxy/4+2,maxx/6,"O wins: %d",o);
+	mvprintw(maxy/4+4,maxx/6,"PRESS ENTER TO EXIT");
+ 	refresh();
+ 	fclose(saveFile);
+ 	getch();
+ 	endwin();
+ 	exit(0);
+    break;
+  case 3: /* Quit */
     getch();
     endwin();
  	exit(0);
     break;
+  
   default:
     break;
   }
-	endwin();
+
+//  endwin();
 	return 1;
 }
