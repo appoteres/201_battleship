@@ -8,8 +8,8 @@
 
 FILE *saveFile;
 WINDOW *board, *prompt, *title;
-int maxx, maxy;
-char menuList[4][20] = {"1 Player","2 Player","SCORES", "EXIT"};
+int maxx, maxy, move1 =0;
+char menuList[4][20] = {"2 PLAYER","SOLO VS COMPUTER","SCORES", "EXIT"};
 
 
 static char currPlayer = 'X';
@@ -29,6 +29,9 @@ void start(){
 
 void drawMenu(int choice){
 	int i;
+	mvprintw(maxy/4,maxx/6,"Welcome to Connect4!");
+	mvprintw(maxy/4+1,maxx/6,"This program was created by Andrew Poteres");
+
 	for (i=0;i<4;i++){
 		move(maxy/2+2*(i-1),(maxx - strlen(menuList[1]))/2);
 		if (i==choice){
@@ -94,12 +97,36 @@ void writeWinner(char currPlayer){
 	}
 }
 
+int valid(BOARD *brd, int move){
+	//make sure not full
+	if(boardFull(brd)){
+		printw("Cannot fit any more pieces in board. Result is draw\n");
+		printw("Press ENTER to exit\n");
+		refresh();
+		getch();
+		endwin();
+		exit(0);
+	}
+	//make sure valid column
+	if (move <= 0 || move > getCols(brd)){
+		printw("Invalid move, try again.\n");
+		refresh();
+		return 0;
+	}
+	//make sure column not full
+	if (getTop(brd,move)<0){
+		printw("Column full, try again.\n");
+		refresh();
+		return 0;
+	}
+	return 1;
+}
 
 int main()
 {
  
-  int chosen;
-  int temp,numRows, numCols,status,x,o;
+  int chosen, cpu;
+  int temp,numRows, numCols,status,xx,o;
   start();
   getmaxyx(stdscr, maxy, maxx);
   chosen = startMenu();
@@ -112,8 +139,7 @@ int main()
   	echo();
   	curs_set(1);
   	mvprintw(2, maxx / 4, "-----INPUT DESIRED BOARD SIZE-----");
-  	mvprintw(maxy / 4, maxx / 6, "PLESAE ENTER IN N[SPACE]M FORMAT");
-  	mvprintw(maxy / 4+2,maxx/6,"MUST BE AT LEAST 4x4, IF SMALLER WILL AUTOMATICALLY BECOME 4x4");
+  	mvprintw(maxy / 4,maxx/6,"MUST BE AT LEAST 4x4, IF SMALLER WILL AUTOMATICALLY BECOME 4x4");
   	mvprintw(maxy / 4+4, maxx / 6, "ENTER NUMBER OF ROWS: ");
   	status = scanw("%i",&numRows);
 
@@ -146,29 +172,27 @@ int main()
 
 	BOARD *mainBoard;
 	mainBoard = newBoard(numRows,numCols);
+	clear();
 	printBoard(mainBoard);
 
 
 	for (;;)
 	{
 
-		int move,x,y;
-		printw("Player %c Where would you like to insert?\n",currPlayer);
-		scanw("%i",&move);
+		int move;
+		printw("Player %c where would you like to insert?\n",currPlayer);
 		refresh();
-
-		if(boardFull(mainBoard)){
-			getyx(stdscr,y,x);
-			mvprintw(y+1,x-x,"Cannot fit any more pieces in board.");
-			refresh();
-			getch();
-			endwin();
-			exit(0);
+		scanw("%i",&move);
+		while(!valid(mainBoard,move)){
+			scanw("%i",&move);
 		}
+
 		insertPiece(mainBoard,move,currPlayer);
+		clear();
+		printBoard(mainBoard);
+
 		if(checkWin(mainBoard, currPlayer)){
-			getyx(stdscr,y,x);
-			mvprintw(y+1,x-x,"Player %c has won!\nPress Enter to Exit",currPlayer);
+			printw("Player %c has won!\nPress ENTER to Exit\n",currPlayer);
 			writeWinner(currPlayer);
 			refresh();
 			getch();
@@ -180,30 +204,119 @@ int main()
 	}
 
     break;
-  case 1: /*2 player*/
+  case 1: /*1 player vs comp*/
+    
+	nodelay(stdscr, FALSE);
+  	clear();
+  	echo();
+  	curs_set(1);
+  	mvprintw(2, maxx / 4, "-----INPUT DESIRED BOARD SIZE-----");
+  	mvprintw(maxy / 4,maxx/6,"MUST BE AT LEAST 4x4, IF SMALLER WILL AUTOMATICALLY BECOME 4x4");
+  	mvprintw(maxy / 4+4, maxx / 6, "ENTER NUMBER OF ROWS: ");
+  	status = scanw("%i",&numRows);
+
+	while (status!=1){
+		while((temp=scanw("%i")) !=EOF && temp!='\n');
+		mvprintw(maxy / 4+8 ,maxx / 6,"Input Error:Please try again\n");
+		move(maxy/4+4,maxx/6 +22);
+		refresh();
+		status = scanw("%i",&numRows);
+	}
+  	refresh();
+
+  	mvprintw(maxy / 4+6, maxx / 6, "ENTER NUMBER OF COLS: ");
+  	status = scanw("%i",&numCols);
+
+	while (status!=1){
+		while((temp=getchar()) !=EOF && temp!='\n');
+		mvprintw(maxy / 4+8 ,maxx / 6,"Input Error:Please try again\n");
+		move(maxy/4+6,maxx/6 +22);
+		refresh();
+		status = scanw("%i",&numCols);
+	}
+
+	if (numCols < 4){
+		numCols =4;
+	}
+	if(numRows < 4){
+		numRows =4;
+	}
+
+	BOARD *cBoard;
+	cBoard = newBoard(numRows,numCols);
+	clear();
+	printBoard(cBoard);
+	int move;
+
+
+	for (;;)
+	{
+		printw("Player %c where would you like to insert?\n",currPlayer);
+		refresh();
+		scanw("%i",&move);
+		while(!valid(cBoard,move)){
+			scanw("%i",&move);
+		}
+
+		insertPiece(cBoard,move,currPlayer);
+		printBoard(cBoard);
+		if(checkWin(cBoard, currPlayer)){
+			printw("Player %c has won!\nPress ENTER to Exit",currPlayer);
+			writeWinner(currPlayer);
+			refresh();
+			getch();
+			endwin();
+			exit(0);
+		}
+		flipTurn();
+
+		clear();
+		cpu = bestMove(cBoard);
+		insertPiece(cBoard,cpu,currPlayer);
+		printBoard(cBoard);
+		printw("CPU has moved to %i\n",cpu);
+		refresh();
+
+		if(checkWin(cBoard, currPlayer)){
+			printw("Player %c has won!\nPress ENTER to Exit",currPlayer);
+			writeWinner(currPlayer);
+			refresh();
+			getch();
+			endwin();
+			exit(0);
+		}
+		if(boardFull(cBoard)){
+			printw("Cannot fit any more pieces in board. Result is draw\n");
+			printw("Press ENTER to exit\n");
+			refresh();
+			getch();
+			endwin();
+			exit(0);
+		}
+
+		flipTurn();
+	}
     break;
+
+
   case 2: /* check scores*/
 
-	//saveFile = fopen("scores.bin","r+");
-	
-	//fseek(saveFile,0,SEEK_SET);
-	// fscanf(saveFile,"%[^\n]",&x);
-	// fscanf(saveFile,"%[^\n]",&o);
-	nodelay(stdscr, FALSE);
-	clear();
-	saveFile = fopen("scores.bin","r+");
-	fseek(saveFile,0,SEEK_SET);
-	fscanf(saveFile,"%d",&x);
-	fscanf(saveFile,"%d",&o);
-	mvprintw(maxy/4,maxx/6,"X wins: %d",x);
-	mvprintw(maxy/4+2,maxx/6,"O wins: %d",o);
-	mvprintw(maxy/4+4,maxx/6,"PRESS ENTER TO EXIT");
- 	refresh();
- 	fclose(saveFile);
- 	getch();
- 	endwin();
- 	exit(0);
-    break;
+		nodelay(stdscr, FALSE);
+		clear();
+		saveFile = fopen("scores.bin","r+");
+		fseek(saveFile,0,SEEK_SET);
+		fscanf(saveFile,"%d",&xx);
+		fscanf(saveFile,"%d",&o);
+		mvprintw(maxy/4,maxx/6,"X wins: %d",xx);
+		mvprintw(maxy/4+2,maxx/6,"O wins: %d",o);
+		mvprintw(maxy/4+4,maxx/6,"PRESS ENTER TO EXIT");
+	 	refresh();
+	 	fclose(saveFile);
+	 	getch();
+	 	endwin();
+	 	exit(0);
+	    break;
+
   case 3: /* Quit */
     getch();
     endwin();
