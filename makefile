@@ -9,4 +9,4 @@ boardgen.o: boardgen.c boardgen.h
 	gcc $(OPTS) boardgen.c
 
 clean: 
-	rm -f $(OBJS) game
+	rm -f $(OBJS) game scores.bin
