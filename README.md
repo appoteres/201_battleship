@@ -22,8 +22,9 @@ In scores, one can check how player 'X' fares against player 'O'. Scores can als
 
 Exit, quits the program.
 
-For more information about the features or about running the program, check out the tutorial video included in the .zip or by going to the link:
+For more information about the features or about running the program, check out the tutorial video by going to the link:
 https://alabama.box.com/s/uudkql4y94m75tuwf864fzehc4qqnru1
+(the file is 57mb, so including it here was wasteful)
 
 Below is a summary of the code:
 
