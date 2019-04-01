@@ -63,7 +63,7 @@ int startMenu(){
 		}
 		if(c == KEY_UP){
 			choice = (choice+4) %5;
-			drawMenu(choice);			
+			drawMenu(choice);
 		}
 		if(i < (int)strlen(s)){
 			mvaddstr(maxy-1,maxx-1-i,s);
@@ -100,7 +100,7 @@ void writeWinner(char currPlayer){
 void eraseScores(){
 	int status;
 	status = (remove("scores.bin"));
-	
+
 	if (status == 0){//file deleted
 		saveFile = fopen("scores.bin","w+");
 		fprintf(saveFile,"  0\n");
@@ -152,7 +152,7 @@ int main()
 
   switch(chosen) {
 	case 0: /* play */
-	  	
+
 	  	nodelay(stdscr, FALSE);
 	  	clear();
 	  	echo();
@@ -224,7 +224,7 @@ int main()
 
 	    break;
  	case 1: /*1 player vs comp*/
-    
+
 		nodelay(stdscr, FALSE);
 	  	clear();
 	  	echo();
@@ -282,6 +282,14 @@ int main()
 			if(checkWin(cBoard, currPlayer)){
 				printw("Player %c has won!\nPress ENTER to Exit",currPlayer);
 				writeWinner(currPlayer);
+				refresh();
+				getch();
+				endwin();
+				exit(0);
+			}
+			if(boardFull(cBoard)){
+				printw("Cannot fit any more pieces in board. Result is draw\n");
+				printw("Press ENTER to exit\n");
 				refresh();
 				getch();
 				endwin();
@@ -358,7 +366,7 @@ int main()
     	endwin();
  		exit(0);
     	break;
-  
+
   default:
     break;
   }

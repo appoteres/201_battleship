@@ -27,7 +27,7 @@ BOARD *newBoard(int row, int col){
 
 	BOARD *tempBoard;
 	tempBoard = malloc(sizeof(BOARD));
-	
+
 	if (tempBoard==0){
 		printw("Allocating a BOARD: out of mem\n");
 		exit(0);
@@ -136,20 +136,20 @@ int checkWin(BOARD *brd,char piece){
 	int n;
 	if (piece == 'X') n = 1;
 	else if(piece == 'O') n = 2;
-	
-	//horizontal -- checking 
+
+	//horizontal -- checking
 	for(int i=0;i<brd->NumRows;i++){
 		for (int j = 0; j<brd->NumCols-3; j++)
 		{
 			//printf(" row %d col %d \n",i,j);
-			if (	brd->index[i][j] == n 
+			if (	brd->index[i][j] == n
 				&&	brd->index[i][j+1] == n
 				&&	brd->index[i][j+2] == n
 				&&	brd->index[i][j+3] == n)
 			{
 
 				return 1;
-			}		
+			}
 		}
 	}
 
@@ -157,8 +157,8 @@ int checkWin(BOARD *brd,char piece){
 	for(int i=0;i<brd->NumCols;i++){
 		for (int j = 3; j<brd->NumRows; j++)
 		{
-			if (	brd->index[j][i] == n 
-				&&	brd->index[j-1][i] == n 
+			if (	brd->index[j][i] == n
+				&&	brd->index[j-1][i] == n
 				&&	brd->index[j-2][i] == n
 				&&	brd->index[j-3][i] == n)
 			{
@@ -170,7 +170,7 @@ int checkWin(BOARD *brd,char piece){
 	//diag // checking SW -> NE
 	for (int i=0;i<brd->NumCols;i++){
 		for(int j=brd->NumRows-1;j>2;j--){
-			if(		brd->index[j][i] == n 
+			if(		brd->index[j][i] == n
 				&&	brd->index[j-1][i+1] == n
 				&&	brd->index[j-2][i+2] == n
 				&&	brd->index[j-3][i+3] == n)
@@ -202,19 +202,19 @@ int checkthree(BOARD *brd, char piece){
 	int n;
 	if (piece == 'X') n = 1;
 	else if(piece == 'O') n = 2;
-	
-	//horizontal -- checking 
+
+	//horizontal -- checking
 	for(int i=0;i<brd->NumRows;i++){
 		for (int j = 0; j<brd->NumCols-3; j++)
 		{
 			//printf(" row %d col %d \n",i,j);
-			if (	brd->index[i][j] == n 
+			if (	brd->index[i][j] == n
 				&&	brd->index[i][j+1] == n
 				&&	brd->index[i][j+2] == n
 				&& 	brd->index [i][j+3] == 0)
 			{
 				return 1;
-			}		
+			}
 		}
 	}
 
@@ -222,8 +222,8 @@ int checkthree(BOARD *brd, char piece){
 	for(int i=0;i<brd->NumCols;i++){
 		for (int j = 3; j<brd->NumRows; j++)
 		{
-			if (	brd->index[j][i] == n 
-				&&	brd->index[j-1][i] == n 
+			if (	brd->index[j][i] == n
+				&&	brd->index[j-1][i] == n
 				&&	brd->index[j-2][i] == n
 				&& 	brd->index[j-3][i] == 0)
 			{
@@ -236,7 +236,7 @@ int checkthree(BOARD *brd, char piece){
 	//diag // checking SW -> NE
 	for (int i=0;i<brd->NumCols;i++){
 		for(int j=brd->NumRows-1;j>2;j--){
-			if(		brd->index[j][i] == n 
+			if(		brd->index[j][i] == n
 				&&	brd->index[j-1][i+1] == n
 				&&	brd->index[j-2][i+2] == n
 				&&	brd->index[j-3][i+3] == 0)
@@ -255,7 +255,7 @@ int checkthree(BOARD *brd, char piece){
 				&&	brd->index[i-2][j-2] == n
 				&&	brd->index[i-3][j-3] == 0)
 			{
-				
+
 				return 1;
 			}
 		}
@@ -266,7 +266,7 @@ int checkthree(BOARD *brd, char piece){
 }
 
 void testInsert(BOARD *brd,int column){
-	
+
 	if (brd->topTrack[column]>=0){
 		brd->index[brd->topTrack[column]][column] = 2;
 		brd->topTrack[column]--;
@@ -275,8 +275,18 @@ void testInsert(BOARD *brd,int column){
 
 }
 
+void testInsertX(BOARD *brd,int column){
+
+	if (brd->topTrack[column]>=0){
+		brd->index[brd->topTrack[column]][column] = 1;
+		brd->topTrack[column]--;
+
+	}
+
+}
+
 void copyBoard(BOARD *srce, BOARD *dest){
-	
+
 	for (int i=0;i<srce->NumRows;i++){
 		for(int j=0;j<srce->NumCols;j++){
 			dest->index[i][j] = srce->index[i][j];
@@ -314,6 +324,27 @@ int bestMove(BOARD *brd){
 		//temp = brd;
 	}
 
+	//check if opponent is going to win and block
+	copyBoard(brd,temp);
+	for (int i=0;i<temp->NumCols;i++){
+		if(temp->topTrack[i]>=0){
+			copyBoard(brd,temp);
+			testInsertX(temp,i);
+			//printw("test insert into %i\n",i+1);
+			//refresh();
+			if(checkWin(temp,'X')){
+				//check best
+				best = i+1;
+				if (best>0 && best <= brd->NumCols && brd->topTrack[i] >=0){
+					return best;
+				}
+			}
+		}
+		//temp = brd;
+	}
+
+
+
 	//check if it can make a line of 3
 	copyBoard(brd,temp);
 	for(int i=0;i<temp->NumCols;i++){
@@ -329,7 +360,7 @@ int bestMove(BOARD *brd){
 				}
 			}
 		}
-	}	
+	}
 
 	// best = rand()%brd->NumCols;
 	if (!(rand()%3)){

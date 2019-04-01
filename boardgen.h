@@ -14,6 +14,7 @@ extern int getTop(BOARD *brd, int col);
 extern void insertPiece(BOARD *brd,int position,char piece);
 extern int checkWin(BOARD *brd, char piece);
 extern void testInsert(BOARD *brd,int column);
+extern void testInsertX(BOARD *brd,int column);
 extern int bestMove(BOARD *brd);
 extern int boardFull(BOARD *brd);
 
