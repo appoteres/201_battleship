@@ -211,6 +211,8 @@ int main()
 			printBoard(mainBoard);
 
 			if(checkWin(mainBoard, currPlayer)){
+				clear();
+				printBoard(mainBoard);
 				printw("Player %c has won!\nPress ENTER to Exit\n",currPlayer);
 				writeWinner(currPlayer);
 				refresh();
@@ -280,6 +282,8 @@ int main()
 			insertPiece(cBoard,move,currPlayer);
 			printBoard(cBoard);
 			if(checkWin(cBoard, currPlayer)){
+				clear();
+				printBoard(cBoard);
 				printw("Player %c has won!\nPress ENTER to Exit",currPlayer);
 				writeWinner(currPlayer);
 				refresh();
@@ -288,6 +292,8 @@ int main()
 				exit(0);
 			}
 			if(boardFull(cBoard)){
+				clear();
+				printBoard(cBoard);
 				printw("Cannot fit any more pieces in board. Result is draw\n");
 				printw("Press ENTER to exit\n");
 				refresh();
@@ -305,6 +311,8 @@ int main()
 			refresh();
 
 			if(checkWin(cBoard, currPlayer)){
+				clear();
+				printBoard(cBoard);
 				printw("Player %c has won!\nPress ENTER to Exit",currPlayer);
 				writeWinner(currPlayer);
 				refresh();
@@ -313,6 +321,8 @@ int main()
 				exit(0);
 			}
 			if(boardFull(cBoard)){
+				clear();
+				printBoard(cBoard);
 				printw("Cannot fit any more pieces in board. Result is draw\n");
 				printw("Press ENTER to exit\n");
 				refresh();
