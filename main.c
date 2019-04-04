@@ -75,8 +75,32 @@ int startMenu(){
 	return choice;
 }
 
+void eraseScores(){
+	int status;
+	status = (remove("scores.bin"));
+
+	if (status == 0){//file deleted
+		saveFile = fopen("scores.bin","w+");
+		fprintf(saveFile,"  0\n");
+		fprintf(saveFile,"  0\n");
+	}
+	else{
+		saveFile = fopen("scores.bin","w");
+		fprintf(saveFile,"  0\n");
+		fprintf(saveFile,"  0\n");
+	}
+	fclose(saveFile);
+	mvprintw(maxy-1,0,"Scores Succesfully Erased");
+	refresh();
+}
+
 void writeWinner(char currPlayer){
-	saveFile = fopen("scores.bin","r+");
+
+	saveFile = fopen("scores.bin","w+");
+	if(saveFile == NULL){
+		eraseScores();
+	}
+	
 	if(currPlayer =='X'){
 		int x;
 		fseek(saveFile,0,SEEK_SET);
@@ -97,24 +121,6 @@ void writeWinner(char currPlayer){
 	}
 }
 
-void eraseScores(){
-	int status;
-	status = (remove("scores.bin"));
-
-	if (status == 0){//file deleted
-		saveFile = fopen("scores.bin","w+");
-		fprintf(saveFile,"  0\n");
-		fprintf(saveFile,"  0\n");
-	}
-	else{
-		saveFile = fopen("scores.bin","w");
-		fprintf(saveFile,"  0\n");
-		fprintf(saveFile,"  0\n");
-	}
-	fclose(saveFile);
-	mvprintw(maxy-1,0,"Scores Succesfully Erased");
-	refresh();
-}
 
 int valid(BOARD *brd, int move){
 	//make sure not full
